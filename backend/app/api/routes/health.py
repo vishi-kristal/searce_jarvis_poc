@@ -27,8 +27,8 @@ async def health_check():
             "status": "healthy",
             "timestamp": datetime.now().isoformat(),
             "agentApiStatus": agent_api_status,
-            "cors_origins": settings.CORS_ORIGINS,
-            "cors_origins_count": len(settings.CORS_ORIGINS)
+            "cors_origins": settings.get_cors_origins_list(),
+            "cors_origins_count": len(settings.get_cors_origins_list())
         }
     except Exception as e:
         logger.error(f"Health check failed: {str(e)}")

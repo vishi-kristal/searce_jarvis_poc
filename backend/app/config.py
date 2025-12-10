@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
-from typing import List
+from pydantic import field_validator
+from typing import List, Union
 import os
 from dotenv import load_dotenv
 
@@ -11,15 +12,28 @@ class Settings(BaseSettings):
     AGENT_API_KEY: str = os.getenv("AGENT_API_KEY", "AIzaSyCeGoGiJI5k_E8utNO5INsmQ3NlMAPMAa4")
     RELATIONSHIP_MANAGER_ID: str = os.getenv("RELATIONSHIP_MANAGER_ID", "001")
     
-    # CORS Configuration
-    CORS_ORIGINS: List[str] = [
-        origin.strip() 
-        for origin in os.getenv(
-            "CORS_ORIGINS",
-            "http://localhost:3000,http://localhost:3001"
-        ).split(",")
-        if origin.strip()  # Remove empty strings
-    ]
+    # CORS Configuration - Use string type to avoid JSON parsing issues
+    CORS_ORIGINS: str = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:3001")
+    
+    @field_validator('CORS_ORIGINS', mode='before')
+    @classmethod
+    def parse_cors_origins(cls, v: Union[str, List[str]]) -> str:
+        """Parse CORS_ORIGINS - keep as string for Pydantic, parse later"""
+        if isinstance(v, list):
+            return ",".join(v)
+        if not v or v.strip() == "":
+            return "http://localhost:3000"
+        return v
+    
+    def get_cors_origins_list(self) -> List[str]:
+        """Get CORS origins as a list"""
+        if not self.CORS_ORIGINS or self.CORS_ORIGINS.strip() == "":
+            return ["http://localhost:3000"]
+        return [
+            origin.strip() 
+            for origin in self.CORS_ORIGINS.split(",")
+            if origin.strip()
+        ]
     
     # Environment
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")

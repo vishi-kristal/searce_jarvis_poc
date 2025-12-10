@@ -21,7 +21,7 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=settings.get_cors_origins_list(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -40,8 +40,9 @@ app.include_router(debug.router, prefix="/api", tags=["debug"])
 async def startup_event():
     logger.info("Starting Kristal Agent PoC API")
     logger.info(f"Agent API URL: {settings.AGENT_API_URL}")
-    logger.info(f"CORS Origins: {settings.CORS_ORIGINS}")
-    logger.info(f"CORS Origins count: {len(settings.CORS_ORIGINS)}")
+    cors_list = settings.get_cors_origins_list()
+    logger.info(f"CORS Origins: {cors_list}")
+    logger.info(f"CORS Origins count: {len(cors_list)}")
 
 @app.on_event("shutdown")
 async def shutdown_event():

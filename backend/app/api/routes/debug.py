@@ -12,8 +12,8 @@ async def debug_env():
     """
     return {
         "raw_cors_origins_env": os.getenv("CORS_ORIGINS", "NOT SET"),
-        "parsed_cors_origins": settings.CORS_ORIGINS,
-        "cors_origins_count": len(settings.CORS_ORIGINS),
+        "parsed_cors_origins": settings.get_cors_origins_list(),
+        "cors_origins_count": len(settings.get_cors_origins_list()),
         "agent_api_url": settings.AGENT_API_URL,
         "relationship_manager_id": settings.RELATIONSHIP_MANAGER_ID,
         "environment": settings.ENVIRONMENT,
