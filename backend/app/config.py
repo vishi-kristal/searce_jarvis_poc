@@ -1,6 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import field_validator, model_validator
-from typing import List, Any, Dict
+from typing import List
 import os
 from dotenv import load_dotenv
 
@@ -17,42 +16,32 @@ class Settings(BaseSettings):
     AGENT_API_KEY: str = os.getenv("AGENT_API_KEY", "AIzaSyCeGoGiJI5k_E8utNO5INsmQ3NlMAPMAa4")
     RELATIONSHIP_MANAGER_ID: str = os.getenv("RELATIONSHIP_MANAGER_ID", "001")
     
-    # CORS Configuration - Use string type, will be set in model_validator
-    CORS_ORIGINS: str = ""
+    # CORS Configuration - Don't let Pydantic process this, read directly
+    # We'll use a property to access it
+    _cors_origins: str = ""
     
-    @model_validator(mode='before')
-    @classmethod
-    def set_cors_origins(cls, data: Any) -> Dict[str, Any]:
-        """Set CORS_ORIGINS from environment before Pydantic processes it"""
-        if isinstance(data, dict):
-            # Get CORS_ORIGINS directly from environment
-            cors_env = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:3001")
-            if not cors_env or cors_env.strip() == "":
-                cors_env = "http://localhost:3000"
-            data["CORS_ORIGINS"] = cors_env
-        return data
+    def __init__(self, **kwargs):
+        # Read CORS_ORIGINS directly from environment, bypassing Pydantic
+        cors_env = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:3001")
+        if not cors_env or cors_env.strip() == "":
+            cors_env = "http://localhost:3000"
+        self._cors_origins = cors_env
+        # Don't pass CORS_ORIGINS to Pydantic
+        kwargs.pop("CORS_ORIGINS", None)
+        super().__init__(**kwargs)
     
-    @field_validator('CORS_ORIGINS', mode='before')
-    @classmethod
-    def parse_cors_origins(cls, v: Any) -> str:
-        """Parse CORS_ORIGINS - ensure it's always a string"""
-        if v is None:
-            return "http://localhost:3000"
-        if isinstance(v, list):
-            return ",".join(str(x) for x in v)
-        if isinstance(v, str):
-            if v.strip() == "":
-                return "http://localhost:3000"
-            return v
-        return str(v) if v else "http://localhost:3000"
+    @property
+    def CORS_ORIGINS(self) -> str:
+        """Get CORS_ORIGINS as string"""
+        return self._cors_origins
     
     def get_cors_origins_list(self) -> List[str]:
         """Get CORS origins as a list"""
-        if not self.CORS_ORIGINS or self.CORS_ORIGINS.strip() == "":
+        if not self._cors_origins or self._cors_origins.strip() == "":
             return ["http://localhost:3000"]
         return [
             origin.strip() 
-            for origin in self.CORS_ORIGINS.split(",")
+            for origin in self._cors_origins.split(",")
             if origin.strip()
         ]
     
