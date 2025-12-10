@@ -13,6 +13,6 @@ COPY . .
 EXPOSE ${PORT:-8000}
 
 # Run application (use PORT env var from Railways)
-# Using JSON format to avoid shell signal issues
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Railways sets PORT automatically, default to 8000 if not set
+CMD uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}
 
