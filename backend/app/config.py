@@ -6,10 +6,20 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def _get_cors_origins_from_env() -> str:
-    """Get CORS_ORIGINS directly from environment, bypassing Pydantic"""
-    cors_env = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:3001")
+    """
+    Get CORS_ORIGINS directly from environment, bypassing Pydantic.
+    
+    IMPORTANT: In production (Railways), you MUST set CORS_ORIGINS environment variable
+    with your Vercel frontend URL, e.g.:
+    CORS_ORIGINS=https://searce-jarvis-poc.vercel.app,http://localhost:3000
+    
+    Default is only for local development.
+    """
+    cors_env = os.getenv("CORS_ORIGINS")
     if not cors_env or cors_env.strip() == "":
-        return "http://localhost:3000"
+        # Default only for local development
+        # In production, CORS_ORIGINS MUST be set via environment variable
+        return "http://localhost:3000,http://localhost:3001"
     return cors_env
 
 class Settings(BaseSettings):
@@ -27,9 +37,15 @@ class Settings(BaseSettings):
     # This prevents Pydantic from trying to parse it as JSON
     
     def get_cors_origins_list(self) -> List[str]:
-        """Get CORS origins as a list - reads directly from environment"""
+        """
+        Get CORS origins as a list - reads directly from environment.
+        
+        IMPORTANT: In production, set CORS_ORIGINS environment variable in Railways
+        with your Vercel frontend URL.
+        """
         cors_str = _get_cors_origins_from_env()
         if not cors_str or cors_str.strip() == "":
+            # Fallback for local development only
             return ["http://localhost:3000"]
         return [
             origin.strip() 
