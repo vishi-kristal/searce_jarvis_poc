@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.routes import chat, session, health
+from app.api.routes import chat, session, health, debug
 from app.config import settings
 from app.middleware.error_handler import setup_error_handlers
 import logging
@@ -34,6 +34,7 @@ setup_error_handlers(app)
 app.include_router(chat.router, prefix="/api", tags=["chat"])
 app.include_router(session.router, prefix="/api", tags=["session"])
 app.include_router(health.router, prefix="/api", tags=["health"])
+app.include_router(debug.router, prefix="/api", tags=["debug"])
 
 @app.on_event("startup")
 async def startup_event():
