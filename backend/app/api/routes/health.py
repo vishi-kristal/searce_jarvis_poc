@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from datetime import datetime
 from app.services.agent_service import AgentService
 from app.utils.logger import logger
+from app.config import settings
 
 router = APIRouter()
 agent_service = AgentService()
@@ -25,7 +26,9 @@ async def health_check():
         return {
             "status": "healthy",
             "timestamp": datetime.now().isoformat(),
-            "agentApiStatus": agent_api_status
+            "agentApiStatus": agent_api_status,
+            "cors_origins": settings.CORS_ORIGINS,
+            "cors_origins_count": len(settings.CORS_ORIGINS)
         }
     except Exception as e:
         logger.error(f"Health check failed: {str(e)}")
