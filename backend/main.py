@@ -30,6 +30,17 @@ app.add_middleware(
 # Setup error handlers
 setup_error_handlers(app)
 
+# Root route
+@app.get("/")
+async def root():
+    return {
+        "message": "Kristal Agent PoC API",
+        "version": "0.1.0",
+        "docs": "/docs",
+        "health": "/api/health",
+        "status": "running"
+    }
+
 # Include routers
 app.include_router(chat.router, prefix="/api", tags=["chat"])
 app.include_router(session.router, prefix="/api", tags=["session"])
