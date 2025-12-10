@@ -67,15 +67,21 @@ NEXT_PUBLIC_API_URL=https://kristal-backend.up.railway.app
 
 ### Step 3: Update CORS in Backend
 
-1. After Vercel deployment, copy your Vercel URL (e.g., `https://your-project.vercel.app`)
+1. After Vercel deployment, copy your Vercel URL (e.g., `https://searce-jarvis-poc.vercel.app`)
 2. Go back to Railways → Variables
 3. Update `CORS_ORIGINS`:
 
 ```bash
-CORS_ORIGINS=https://your-project.vercel.app,http://localhost:3000
+CORS_ORIGINS=https://searce-jarvis-poc.vercel.app,http://localhost:3000
 ```
 
-4. Redeploy backend on Railways
+**Important**: 
+- No spaces after commas
+- Include `https://` protocol
+- No trailing slashes
+- Exact URL match (case-sensitive domain)
+
+4. **Redeploy backend on Railways** (this is critical - env vars require redeploy)
 
 ---
 
