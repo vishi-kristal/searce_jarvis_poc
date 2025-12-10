@@ -1,17 +1,15 @@
-from pydantic_settings import BaseSettings
-from pydantic import field_validator, ConfigDict
-from typing import List, Union, Any
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import field_validator, model_validator
+from typing import List, Any, Dict
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
 class Settings(BaseSettings):
-    model_config = ConfigDict(
+    model_config = SettingsConfigDict(
         env_file=".env",
         case_sensitive=True,
-        # Don't parse environment variables as JSON automatically
-        env_parse_none_str=True,
     )
     
     # Agent API Configuration
@@ -19,17 +17,20 @@ class Settings(BaseSettings):
     AGENT_API_KEY: str = os.getenv("AGENT_API_KEY", "AIzaSyCeGoGiJI5k_E8utNO5INsmQ3NlMAPMAa4")
     RELATIONSHIP_MANAGER_ID: str = os.getenv("RELATIONSHIP_MANAGER_ID", "001")
     
-    # CORS Configuration - Use string type to avoid JSON parsing issues
-    # Get from env directly to avoid Pydantic trying to parse as JSON
+    # CORS Configuration - Use string type, will be set in model_validator
     CORS_ORIGINS: str = ""
     
-    def __init__(self, **kwargs):
-        # Get CORS_ORIGINS directly from environment before Pydantic processes it
-        cors_env = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:3001")
-        if not cors_env or cors_env.strip() == "":
-            cors_env = "http://localhost:3000"
-        kwargs.setdefault("CORS_ORIGINS", cors_env)
-        super().__init__(**kwargs)
+    @model_validator(mode='before')
+    @classmethod
+    def set_cors_origins(cls, data: Any) -> Dict[str, Any]:
+        """Set CORS_ORIGINS from environment before Pydantic processes it"""
+        if isinstance(data, dict):
+            # Get CORS_ORIGINS directly from environment
+            cors_env = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:3001")
+            if not cors_env or cors_env.strip() == "":
+                cors_env = "http://localhost:3000"
+            data["CORS_ORIGINS"] = cors_env
+        return data
     
     @field_validator('CORS_ORIGINS', mode='before')
     @classmethod
