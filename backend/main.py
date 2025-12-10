@@ -39,6 +39,8 @@ app.include_router(health.router, prefix="/api", tags=["health"])
 async def startup_event():
     logger.info("Starting Kristal Agent PoC API")
     logger.info(f"Agent API URL: {settings.AGENT_API_URL}")
+    logger.info(f"CORS Origins: {settings.CORS_ORIGINS}")
+    logger.info(f"CORS Origins count: {len(settings.CORS_ORIGINS)}")
 
 @app.on_event("shutdown")
 async def shutdown_event():

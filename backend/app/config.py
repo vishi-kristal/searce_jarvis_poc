@@ -12,10 +12,14 @@ class Settings(BaseSettings):
     RELATIONSHIP_MANAGER_ID: str = os.getenv("RELATIONSHIP_MANAGER_ID", "001")
     
     # CORS Configuration
-    CORS_ORIGINS: List[str] = os.getenv(
-        "CORS_ORIGINS",
-        "http://localhost:3000,http://localhost:3001"
-    ).split(",")
+    CORS_ORIGINS: List[str] = [
+        origin.strip() 
+        for origin in os.getenv(
+            "CORS_ORIGINS",
+            "http://localhost:3000,http://localhost:3001"
+        ).split(",")
+        if origin.strip()  # Remove empty strings
+    ]
     
     # Environment
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
