@@ -56,14 +56,27 @@ CORS_ORIGINS=http://localhost:3000
 
 ### Step 2: Deploy Frontend (Vercel)
 
-1. Go to Vercel → Your Project → Settings → Environment Variables
-2. Add this **Required** variable:
+1. Go to **Vercel Dashboard** → Your Project → **Settings** → **Environment Variables**
+2. Click **"Add New"**
+3. Add this **Required** variable:
 
-```bash
-NEXT_PUBLIC_API_URL=https://kristal-backend.up.railway.app
+**Variable Name:**
+```
+NEXT_PUBLIC_API_URL
 ```
 
-(Use the Railways URL from Step 1)
+**Value:**
+```
+https://kristal-backend.up.railway.app
+```
+(Use the Railways backend URL from Step 1)
+
+**Environments:** Select all (Production, Preview, Development)
+
+4. Click **"Save"**
+5. **Redeploy** your frontend (go to Deployments → Latest → Redeploy)
+
+**⚠️ Important:** The frontend must be redeployed after setting this environment variable!
 
 ### Step 3: Update CORS in Backend
 
